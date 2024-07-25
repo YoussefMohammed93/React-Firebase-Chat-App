@@ -1,3 +1,26 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  background-image: url("/bg.jpg");
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.chat-container {
+  display: flex;
+  backdrop-filter: blur(15px) saturate(180%);
+}
+
+.details,
+.list {
+  flex: 1;
+}
+
+.chat {
+  flex: 2;
+}
