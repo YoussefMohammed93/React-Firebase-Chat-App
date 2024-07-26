@@ -1,8 +1,8 @@
 import UserAvatar from "/avatar.png";
-import XMarkIcon from "/xMark.png";
-export default function AddUser({ setAddMode }) {
+
+export default function AddUser() {
   return (
-    <div className="add-user w-max h-max pt-12 pb-8 px-8 bg-[#111928ef] absolute inset-0 m-auto rounded-lg z-10">
+    <div className="add-user w-max h-max p-6 bg-[#111928ef] absolute inset-0 m-auto rounded-lg z-10">
       <form className="flex gap-4">
         <input
           type="text"
@@ -27,12 +27,6 @@ export default function AddUser({ setAddMode }) {
           Add User
         </button>
       </div>
-      <button
-        className="close-button text-white  transition-all duration-200 px-2 py-1 rounded-md mt-4 absolute top-[-12px] right-5"
-        onClick={() => setAddMode(false)}
-      >
-        <img src={XMarkIcon} alt="x-icon" className="w-8 h-8" />
-      </button>
     </div>
   );
 }

@@ -30,7 +30,7 @@ export default function ChatList() {
           <img
             src={addMode ? MinusIcon : PlusIcon}
             alt="plus-icon"
-            className="w-[17.5px] h-[17.5px]"
+            className="w-[17.px] h-[17.5px]"
           />
         </button>
       </div>
@@ -153,7 +153,7 @@ export default function ChatList() {
           </button>
         </li>
       </ul>
-      {addMode && <AddUser setAddMode={setAddMode} />}
+      {addMode && <AddUser />}
     </div>
   );
 }
