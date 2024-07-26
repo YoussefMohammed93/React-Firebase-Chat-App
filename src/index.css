@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+  width: 12.5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #19284298;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #192842dc;
+}
+
 body {
   background-image: url("/bg.jpg");
   background-position: center;
@@ -17,10 +34,15 @@ body {
 }
 
 .details,
-.list {
+.list,
+.search-bar {
   flex: 1;
 }
 
 .chat {
   flex: 2;
+}
+
+.chat-list-li:not(:last-child) {
+  border-bottom: 1px solid #dddddd35;
 }
