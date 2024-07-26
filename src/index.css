@@ -90,3 +90,12 @@ body {
   color: white;
   background: #11192899;
 }
+
+.login-btn:disabled {
+  cursor: not-allowed;
+  background: #1f8ff154;
+}
+
+.login-btn:disabled:hover {
+  background: #1f8ff154;
+}
