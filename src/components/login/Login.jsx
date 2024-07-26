@@ -1,5 +1,6 @@
 import { useState } from "react";
 import UserAvatar from "/avatar.png";
+import { toast } from "react-toastify";
 
 export default function Login() {
   const [avatar, setAvatar] = useState({
@@ -16,11 +17,19 @@ export default function Login() {
     }
   };
 
+  const handleLogin = (e) => {
+    e.preventDefault();
+    toast.success("Hello");
+  };
+
   return (
     <div className="login w-full h-full flex items-center gap-20">
       <div className="login-item flex flex-col items-center gap-4">
         <h2 className="text-4xl text-white font-semibold">Welcome Back,</h2>
-        <form className="flex flex-col items-center justify-center gap-4">
+        <form
+          onSubmit={handleLogin}
+          className="flex flex-col items-center justify-center gap-4"
+        >
           <input type="text" placeholder="Email" name="Email" />
           <input type="password" placeholder="Password" name="Password" />
           <button className="w-full bg-[#5185fee7] text-white hover:bg-[#3d64bee7] transition-all duration-200 p-2 rounded-md">
