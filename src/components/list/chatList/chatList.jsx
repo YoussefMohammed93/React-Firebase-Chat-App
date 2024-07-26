@@ -3,6 +3,7 @@ import SearchIcon from "/search.png";
 import PlusIcon from "/plus.png";
 import MinusIcon from "/minus.png";
 import UserAvatar from "/avatar.png";
+import AddUser from "./addUser/AddUser";
 
 export default function ChatList() {
   const [addMode, setAddMode] = useState(false);
@@ -29,7 +30,7 @@ export default function ChatList() {
           <img
             src={addMode ? MinusIcon : PlusIcon}
             alt="plus-icon"
-            className="w-[17.px] h-[17.5px]"
+            className="w-[17.5px] h-[17.5px]"
           />
         </button>
       </div>
@@ -152,6 +153,7 @@ export default function ChatList() {
           </button>
         </li>
       </ul>
+      {addMode && <AddUser setAddMode={setAddMode} />}
     </div>
   );
 }
