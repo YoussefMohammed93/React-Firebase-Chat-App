@@ -9,7 +9,7 @@ export default function ChatList() {
 
   return (
     <div className="chat-list overflow-y-auto">
-      <div className="search flex items-center justify-between gap-4 p-3">
+      <div className="search flex items-center justify-between gap-4 px-3">
         <div className="search-bar relative">
           <img
             src={SearchIcon}
@@ -33,7 +33,7 @@ export default function ChatList() {
           />
         </button>
       </div>
-      <ul>
+      <ul className="mt-[6px]">
         <li className="chat-list-li">
           <button className="item w-full p-3 flex items-center gap-3 text-start hover:bg-[#1119284e] transition-all duration-200">
             <img

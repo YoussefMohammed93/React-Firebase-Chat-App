@@ -16,14 +16,14 @@ export default function UserInfo() {
           Youssef Mohammed
         </h2>
       </div>
-      <div className="icons flex items-center gap-4">
-        <button>
+      <div className="icons flex items-center">
+        <button className="hover:bg-[#1119284e] transition-all duration-200 p-[6px] rounded-full">
           <img src={MoreIcon} alt="more-icon" className="w-5 h-5" />
         </button>
-        <button>
+        <button className="hover:bg-[#1119284e] transition-all duration-200 p-2 rounded-full">
           <img src={VideoIcon} alt="video-icon" className="w-5 h-5" />
         </button>
-        <button>
+        <button className="hover:bg-[#1119284e] transition-all duration-200 p-2 rounded-full">
           <img src={EditIcon} alt="edit-icon" className="w-5 h-5" />
         </button>
       </div>

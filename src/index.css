@@ -7,7 +7,7 @@
 }
 
 ::-webkit-scrollbar {
-  width: 12.5px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -35,7 +35,8 @@ body {
 
 .details,
 .list,
-.search-bar {
+.search-bar,
+.chat-center {
   flex: 1;
 }
 
@@ -45,4 +46,37 @@ body {
 
 .chat-list-li:not(:last-child) {
   border-bottom: 1px solid #dddddd35;
+}
+
+.message.own {
+  align-self: flex-end;
+}
+
+.message .texts {
+  position: relative;
+}
+
+.message .texts p {
+  position: relative;
+  background: #11192880;
+}
+
+.message .texts .triangle {
+  position: absolute;
+  top: 12px;
+  left: -13px;
+  width: 0;
+  height: 0;
+  border-top: 7px solid #11192880;
+  border-right: 7px solid #11192880;
+  border-left: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+}
+
+.message.own .texts p {
+  background: #5185fe52;
+}
+
+.message.own .texts p::before {
+  border: none;
 }
