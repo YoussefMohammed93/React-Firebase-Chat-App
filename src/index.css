@@ -36,7 +36,8 @@ body {
 .details,
 .list,
 .search-bar,
-.chat-center {
+.chat-center,
+.login-item {
   flex: 1;
 }
 
@@ -79,4 +80,13 @@ body {
 
 .message.own .texts p::before {
   border: none;
+}
+
+.login-item input {
+  padding: 12px;
+  border: 1px solid #dddddd35;
+  outline: none;
+  border-radius: 6px;
+  color: white;
+  background: rgba(17, 25, 40, 0.6);
 }
