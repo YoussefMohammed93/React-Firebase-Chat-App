@@ -9,9 +9,12 @@ import ImgIcon from "/img.png";
 import CamIcon from "/camera.png";
 import MicIcon from "/mic.png";
 import PatternImg from "/pattern.svg";
+import { DB } from "../../lib/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
 
 export default function Chat() {
   const [open, setOpen] = useState(false);
+  const [chat, setChat] = useState();
   const [text, setText] = useState("");
   const handleEmoji = (e) => {
     setText((prev) => prev + e.emoji);
@@ -21,6 +24,19 @@ export default function Chat() {
 
   useEffect(() => {
     endRef.current.scrollIntoView({ behavior: "smooth" });
+  }, []);
+
+  useEffect(() => {
+    const unSub = onSnapshot(
+      doc(DB, "chats", "u3AenQTR6xT1ZrGb2YoH"),
+      (res) => {
+        setChat(res.data());
+      }
+    );
+
+    return () => {
+      unSub();
+    };
   }, []);
 
   return (

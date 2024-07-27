@@ -41,6 +41,8 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
+
+    toast.success("Logged In Now!");
   };
 
   const handleRegister = async (e) => {

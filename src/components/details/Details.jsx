@@ -3,6 +3,7 @@ import ArrowUpIcon from "/arrowUp.png";
 import ArrowDownIcon from "/arrowDown.png";
 import PatternImg from "/pattern.svg";
 import DownloadIcon from "/download.png";
+import { auth } from "../../lib/firebase";
 
 export default function Details() {
   return (
@@ -124,7 +125,10 @@ export default function Details() {
         <button className="bg-[#cb5555] text-white hover:bg-[#a93737] transition-all duration-200 p-2 rounded-md">
           Block User
         </button>
-        <button className="bg-[#5185fee7] text-white hover:bg-[#3d64bee7] transition-all duration-200 p-2 rounded-md">
+        <button
+          onClick={() => auth.signOut()}
+          className="bg-[#5185fee7] text-white hover:bg-[#3d64bee7] transition-all duration-200 p-2 rounded-md"
+        >
           Log Out
         </button>
       </div>

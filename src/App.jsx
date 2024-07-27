@@ -6,23 +6,34 @@ import Notifications from "./components/notifications/Notifications";
 import { useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./lib/firebase";
+import { useUserStore } from "./lib/userStore";
 
 export default function App() {
-  const user = false;
+  const { currentUser, isLoading, fetchUserInfo } = useUserStore();
 
   useEffect(() => {
     const unSub = onAuthStateChanged(auth, (user) => {
-      console.log(user);
+      fetchUserInfo(user?.uid);
     });
 
     return () => {
       unSub();
     };
-  }, []);
+  }, [fetchUserInfo]);
+
+  if (isLoading)
+    return (
+      <div className="lds-ring">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    );
 
   return (
     <main className="chat-container w-[95vw] h-[90vh] bg-[#111928bf] border border-[#ffffff20] rounded-lg">
-      {user ? (
+      {currentUser ? (
         <>
           <List />
           <Chat />

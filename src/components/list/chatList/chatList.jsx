@@ -1,12 +1,47 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchIcon from "/search.png";
 import PlusIcon from "/plus.png";
 import MinusIcon from "/minus.png";
 import UserAvatar from "/avatar.png";
 import AddUser from "./addUser/AddUser";
+import { useUserStore } from "../../../lib/userStore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { DB } from "../../../lib/firebase";
 
-export default function ChatList() {
+const ChatList = () => {
+  const [chats, setChats] = useState([]);
   const [addMode, setAddMode] = useState(false);
+  const { currentUser } = useUserStore();
+
+  useEffect(() => {
+    const unSub = onSnapshot(
+      doc(DB, "userchats", currentUser.id),
+      async (res) => {
+        const data = res.data();
+        if (!data) {
+          setChats([]);
+          return;
+        }
+
+        const items = data.chats;
+        const promises = items.map(async (item) => {
+          const userDocRef = doc(DB, "users", item.receiverId);
+          const userDocSnap = await getDoc(userDocRef);
+          const user = userDocSnap.data();
+
+          return { ...item, user };
+        });
+
+        const chatData = await Promise.all(promises);
+
+        setChats(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
+      }
+    );
+
+    return () => {
+      unSub();
+    };
+  }, [currentUser.id]);
 
   return (
     <div className="chat-list overflow-y-auto">
@@ -35,125 +70,27 @@ export default function ChatList() {
         </button>
       </div>
       <ul className="mt-[6px]">
-        <li className="chat-list-li">
-          <button className="item w-full p-3 flex items-center gap-3 text-start hover:bg-[#1119284e] transition-all duration-200">
-            <img
-              src={UserAvatar}
-              alt="user-icon"
-              className="w-11 h-11 rounded-full"
-            />
-            <div className="texts">
-              <span className="font-semibold text-white">Youssef Mohammed</span>
-              <p className="text-sm text-[#d2d2d2]">Hello!</p>
-            </div>
-          </button>
-        </li>
-        <li className="chat-list-li">
-          <button className="item w-full p-3 flex items-center gap-3 text-start hover:bg-[#1119284e] transition-all duration-200">
-            <img
-              src={UserAvatar}
-              alt="user-icon"
-              className="w-11 h-11 rounded-full"
-            />
-            <div className="texts">
-              <span className="font-semibold text-white">Youssef Mohammed</span>
-              <p className="text-sm text-[#d2d2d2]">Hello!</p>
-            </div>
-          </button>
-        </li>
-        <li className="chat-list-li">
-          <button className="item w-full p-3 flex items-center gap-3 text-start hover:bg-[#1119284e] transition-all duration-200">
-            <img
-              src={UserAvatar}
-              alt="user-icon"
-              className="w-11 h-11 rounded-full"
-            />
-            <div className="texts">
-              <span className="font-semibold text-white">Youssef Mohammed</span>
-              <p className="text-sm text-[#d2d2d2]">Hello!</p>
-            </div>
-          </button>
-        </li>
-        <li className="chat-list-li">
-          <button className="item w-full p-3 flex items-center gap-3 text-start hover:bg-[#1119284e] transition-all duration-200">
-            <img
-              src={UserAvatar}
-              alt="user-icon"
-              className="w-11 h-11 rounded-full"
-            />
-            <div className="texts">
-              <span className="font-semibold text-white">Youssef Mohammed</span>
-              <p className="text-sm text-[#d2d2d2]">Hello!</p>
-            </div>
-          </button>
-        </li>
-        <li className="chat-list-li">
-          <button className="item w-full p-3 flex items-center gap-3 text-start hover:bg-[#1119284e] transition-all duration-200">
-            <img
-              src={UserAvatar}
-              alt="user-icon"
-              className="w-11 h-11 rounded-full"
-            />
-            <div className="texts">
-              <span className="font-semibold text-white">Youssef Mohammed</span>
-              <p className="text-sm text-[#d2d2d2]">Hello!</p>
-            </div>
-          </button>
-        </li>
-        <li className="chat-list-li">
-          <button className="item w-full p-3 flex items-center gap-3 text-start hover:bg-[#1119284e] transition-all duration-200">
-            <img
-              src={UserAvatar}
-              alt="user-icon"
-              className="w-11 h-11 rounded-full"
-            />
-            <div className="texts">
-              <span className="font-semibold text-white">Youssef Mohammed</span>
-              <p className="text-sm text-[#d2d2d2]">Hello!</p>
-            </div>
-          </button>
-        </li>
-        <li className="chat-list-li">
-          <button className="item w-full p-3 flex items-center gap-3 text-start hover:bg-[#1119284e] transition-all duration-200">
-            <img
-              src={UserAvatar}
-              alt="user-icon"
-              className="w-11 h-11 rounded-full"
-            />
-            <div className="texts">
-              <span className="font-semibold text-white">Youssef Mohammed</span>
-              <p className="text-sm text-[#d2d2d2]">Hello!</p>
-            </div>
-          </button>
-        </li>
-        <li className="chat-list-li">
-          <button className="item w-full p-3 flex items-center gap-3 text-start hover:bg-[#1119284e] transition-all duration-200">
-            <img
-              src={UserAvatar}
-              alt="user-icon"
-              className="w-11 h-11 rounded-full"
-            />
-            <div className="texts">
-              <span className="font-semibold text-white">Youssef Mohammed</span>
-              <p className="text-sm text-[#d2d2d2]">Hello!</p>
-            </div>
-          </button>
-        </li>
-        <li className="chat-list-li">
-          <button className="item w-full p-3 flex items-center gap-3 text-start hover:bg-[#1119284e] transition-all duration-200">
-            <img
-              src={UserAvatar}
-              alt="user-icon"
-              className="w-11 h-11 rounded-full"
-            />
-            <div className="texts">
-              <span className="font-semibold text-white">Youssef Mohammed</span>
-              <p className="text-sm text-[#d2d2d2]">Hello!</p>
-            </div>
-          </button>
-        </li>
+        {chats.map((chat) => (
+          <li className="chat-list-li" key={chat.chatId}>
+            <button className="item w-full p-3 flex items-center gap-3 text-start hover:bg-[#1119284e] transition-all duration-200">
+              <img
+                src={chat.user.avatar || UserAvatar}
+                alt="user-icon"
+                className="w-11 h-11 rounded-full"
+              />
+              <div className="texts">
+                <span className="font-semibold text-white">
+                  {chat.user.Username || "Unknown User"}
+                </span>
+                <p className="text-sm text-[#d2d2d2]">{chat.lastMessage}</p>
+              </div>
+            </button>
+          </li>
+        ))}
       </ul>
       {addMode && <AddUser />}
     </div>
   );
-}
+};
+
+export default ChatList;
