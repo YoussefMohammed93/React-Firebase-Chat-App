@@ -17,6 +17,7 @@
     "react-dom": "^18.3.1",
     "react-dropdown-menu": "^0.0.2",
     "react-toastify": "^10.0.5",
+    "uuid": "^10.0.0",
     "zustand": "^4.5.4"
   },
   "devDependencies": {

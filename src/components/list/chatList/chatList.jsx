@@ -8,10 +8,12 @@ import { useUserStore } from "../../../lib/userStore";
 import { useChatStore } from "../../../lib/chatStore";
 import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { DB } from "../../../lib/firebase";
+import Spinner from "../../Load/Spinner";
 
-const ChatList = () => {
+const ChatList = ({ setShowChatList }) => {
   const [chats, setChats] = useState([]);
   const [addMode, setAddMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // State for loading
   const { currentUser } = useUserStore();
   const { changeChat, chatId } = useChatStore();
 
@@ -22,6 +24,7 @@ const ChatList = () => {
         const data = res.data();
         if (!data) {
           setChats([]);
+          setIsLoading(false); // Set loading to false when data is fetched
           return;
         }
 
@@ -36,6 +39,7 @@ const ChatList = () => {
 
         const chatData = await Promise.all(promises);
         setChats(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
+        setIsLoading(false); // Set loading to false when data is fetched
       }
     );
 
@@ -62,10 +66,19 @@ const ChatList = () => {
         chats: userChats,
       });
       changeChat(chat.chatId, chat.user);
+      setShowChatList(false);
     } catch (err) {
       console.log(err);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div className="chat-list overflow-y-auto">
@@ -93,6 +106,11 @@ const ChatList = () => {
           />
         </button>
       </div>
+      {chats.length === 0 && !addMode && (
+        <p className="text-center text-white mt-4">
+          Add Users And Start Chat With Them
+        </p>
+      )}
       <ul className="mt-[6px]">
         {chats.map((chat) => (
           <li
@@ -105,7 +123,7 @@ const ChatList = () => {
           >
             <button
               className="item w-full p-3 flex items-center gap-3 text-start hover:bg-[#1119284e] transition-all duration-200"
-              onClick={() => changeChat(chat.chatId, chat.user)}
+              onClick={() => handleSelect(chat)}
             >
               <img
                 src={chat.user.avatar || UserAvatar}

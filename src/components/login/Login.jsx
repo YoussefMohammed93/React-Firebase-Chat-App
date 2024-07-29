@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signOut,
 } from "firebase/auth";
 import { auth, DB } from "../../lib/firebase";
 import { doc, setDoc } from "firebase/firestore";
@@ -35,14 +36,13 @@ export default function Login() {
 
     try {
       await signInWithEmailAndPassword(auth, Email, Password);
+      toast.success("Logged in successfully!");
     } catch (err) {
       console.log(err);
       toast.error(err.message);
     } finally {
       setLoading(false);
     }
-
-    toast.success("Logged In Now!");
   };
 
   const handleRegister = async (e) => {
@@ -51,6 +51,18 @@ export default function Login() {
 
     const formData = new FormData(e.target);
     const { Username, Email, Password } = Object.fromEntries(formData);
+
+    if (!Username || !Email || !Password) {
+      toast.error("Please complete all fields");
+      setLoading(false);
+      return;
+    }
+
+    if (!avatar.file) {
+      toast.error("Please upload your profile picture");
+      setLoading(false);
+      return;
+    }
 
     try {
       const res = await createUserWithEmailAndPassword(auth, Email, Password);
@@ -67,7 +79,8 @@ export default function Login() {
         chats: [],
       });
 
-      toast.success("Account Created, You Can Login Now!");
+      await signOut(auth);
+      toast.success("Account created successfully! Please log in.");
     } catch (err) {
       console.log(err);
       toast.error(err.message);
@@ -77,15 +90,25 @@ export default function Login() {
   };
 
   return (
-    <div className="login w-full h-full flex items-center gap-20">
-      <div className="login-item flex flex-col items-center gap-4">
+    <div className="login w-full h-screen flex flex-col items-center md:flex-row md:justify-center gap-10 md:gap-40 py-10 px-5">
+      <div className="login-item flex flex-col items-center gap-4 w-full md:max-w-md">
         <h2 className="text-4xl text-white font-semibold">Welcome Back,</h2>
         <form
           onSubmit={handleLogin}
-          className="flex flex-col items-center justify-center gap-4"
+          className="flex flex-col items-center justify-center gap-4 md:gap-6 w-full  md:max-w-md"
         >
-          <input type="text" placeholder="Email" name="Email" />
-          <input type="password" placeholder="Password" name="Password" />
+          <input
+            type="text"
+            placeholder="Email"
+            name="Email"
+            className="w-full md:max-w-md"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            name="Password"
+            className="w-full md:max-w-md"
+          />
           <button
             disabled={loading}
             className="login-btn w-full bg-[#5185fee7] text-white hover:bg-[#3d64bee7] transition-all duration-200 p-2 rounded-md"
@@ -94,12 +117,12 @@ export default function Login() {
           </button>
         </form>
       </div>
-      <div className="separator h-full w-[1px] bg-[#dddddd35]"></div>
-      <div className="login-item flex flex-col items-center gap-4">
+      <div className="separator hidden h-full w-[1px] bg-[#dddddd35]"></div>
+      <div className="login-item flex flex-col items-center gap-4 md:gap-16 w-full md:max-w-md">
         <h2 className="text-4xl text-white font-semibold">Create An Account</h2>
         <form
           onSubmit={handleRegister}
-          className="flex flex-col items-center justify-center gap-4"
+          className="flex flex-col items-center justify-center gap-4 w-full md:max-w-md"
         >
           <label
             htmlFor="file"
@@ -118,9 +141,24 @@ export default function Login() {
             style={{ display: "none" }}
             onChange={handleAvatar}
           />
-          <input type="text" placeholder="Username" name="Username" />
-          <input type="text" placeholder="Email" name="Email" />
-          <input type="password" placeholder="Password" name="Password" />
+          <input
+            type="text"
+            placeholder="Username"
+            name="Username"
+            className="w-full md:max-w-md"
+          />
+          <input
+            type="text"
+            placeholder="Email"
+            name="Email"
+            className="w-full md:max-w-md"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            name="Password"
+            className="w-full md:max-w-md"
+          />
           <button
             disabled={loading}
             className="login-btn w-full bg-[#5185fee7] text-white hover:bg-[#3d64bee7] transition-all duration-200 p-2 rounded-md"

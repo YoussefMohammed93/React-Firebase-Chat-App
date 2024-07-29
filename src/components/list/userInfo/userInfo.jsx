@@ -10,11 +10,15 @@ export default function UserInfo() {
   const dropdownRef = useRef(null);
 
   const toggleMenu = () => {
-    setIsOpen(!isOpen);
+    setIsOpen((prev) => !prev);
   };
 
   const handleClickOutside = (event) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target) &&
+      !event.target.closest(".user-info .icons button")
+    ) {
       setIsOpen(false);
     }
   };
@@ -26,13 +30,14 @@ export default function UserInfo() {
       document.removeEventListener("mousedown", handleClickOutside);
     }
 
+    // Cleanup on component unmount
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
 
   return (
-    <div className="user-info flex items-center justify-between p-3 relative">
+    <div className="user-info flex items-center justify-between p-3 relative md:flex-row">
       <div className="user flex items-center">
         <img
           src={currentUser.avatar || UserAvatar}
@@ -40,10 +45,10 @@ export default function UserInfo() {
           className="w-11 h-11 rounded-full"
         />
         <h2 className="text-lg font-semibold text-white ml-3">
-          {currentUser.Username}
+          {currentUser.Username} ( You )
         </h2>
       </div>
-      <div className="icons flex items-center">
+      <div className="icons flex items-center md:ml-auto mt-2 md:mt-0">
         <button
           onClick={toggleMenu}
           className="hover:bg-[#1119284e] transition-all duration-200 p-[9px] rounded-full"
@@ -53,10 +58,13 @@ export default function UserInfo() {
         {isOpen && (
           <div
             ref={dropdownRef}
-            className="dropdown-menu absolute right-[18px] top-[56px] w-48 bg-[#2c61dc] rounded shadow-lg z-20"
+            className="dropdown-menu absolute right-3 top-[70px] md:top-6 md:right-16 w-48 bg-[#2c61dc] rounded shadow-lg z-20"
           >
             <button
-              onClick={() => auth.signOut()}
+              onClick={() => {
+                auth.signOut();
+                setIsOpen(false);
+              }}
               className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#355db9] rounded duration-200 transition-all"
             >
               Log Out

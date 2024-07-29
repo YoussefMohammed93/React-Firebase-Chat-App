@@ -13,10 +13,10 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #19284298;
+  background: #0d142198;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #192842dc;
+  background: #070b1298;
 }
 
 body {
@@ -100,17 +100,32 @@ body {
   background: #1f8ff154;
 }
 
-.lds-ring,
-.lds-ring div {
-  box-sizing: border-box;
+/* styles.css or Spinner.module.css */
+.spinner-overlay {
+  position: fixed; /* Fixed positioning ensures it stays in place when scrolling */
+  top: 0;
+  left: 0;
+  width: 100vw; /* Full viewport width */
+  height: 100vh; /* Full viewport height */
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  background-color: rgba(
+    0,
+    0,
+    0,
+    0.5
+  ); /* Optional: Adds a semi-transparent background */
+  z-index: 9999; /* Ensure it appears above other content */
 }
+
 .lds-ring {
   display: inline-block;
   position: relative;
   width: 80px;
   height: 80px;
-  color: white;
 }
+
 .lds-ring div {
   box-sizing: border-box;
   display: block;
@@ -118,20 +133,24 @@ body {
   width: 64px;
   height: 64px;
   margin: 8px;
-  border: 8px solid currentColor;
+  border: 8px solid #fff;
   border-radius: 50%;
-  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  border-color: currentColor transparent transparent transparent;
+  border-color: #fff transparent transparent transparent;
+  animation: lds-ring 1.2s linear infinite;
 }
+
 .lds-ring div:nth-child(1) {
   animation-delay: -0.45s;
 }
+
 .lds-ring div:nth-child(2) {
   animation-delay: -0.3s;
 }
+
 .lds-ring div:nth-child(3) {
   animation-delay: -0.15s;
 }
+
 @keyframes lds-ring {
   0% {
     transform: rotate(0deg);

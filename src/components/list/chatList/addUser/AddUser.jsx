@@ -32,7 +32,11 @@ export default function AddUser() {
       const querySnapShot = await getDocs(q);
 
       if (!querySnapShot.empty) {
-        setUser(querySnapShot.docs[0].data());
+        const foundUser = querySnapShot.docs[0].data();
+        if (foundUser.id === currentUser.id) {
+          foundUser.Username += " ( You )";
+        }
+        setUser(foundUser);
       } else {
         toast.error("User not found");
       }
@@ -43,6 +47,10 @@ export default function AddUser() {
 
   const handleAdd = async () => {
     if (!user) return;
+    if (user.id === currentUser.id) {
+      toast.info("You cannot add yourself");
+      return;
+    }
 
     const userChatsRef = collection(DB, "userchats");
     const currentUserChatDoc = doc(userChatsRef, currentUser.id);
@@ -132,12 +140,21 @@ export default function AddUser() {
             />
             <span className="text-white">{user.Username}</span>
           </div>
-          <button
-            onClick={handleAdd}
-            className="bg-[#5185fee7] text-white hover:bg-[#3d64bee7] transition-all duration-200 px-2 py-1 rounded-md"
-          >
-            Add User
-          </button>
+          {user.Username.endsWith("(You)") ? (
+            <button
+              className="bg-[#5185fe5c] text-white cursor-not-allowed hover:bg-[#5185fe5c] transition-all duration-200 px-2 py-1 rounded-md"
+              disabled
+            >
+              Add User
+            </button>
+          ) : (
+            <button
+              onClick={handleAdd}
+              className="bg-[#5185fee7] text-white hover:bg-[#3d64bee7] transition-all duration-200 px-2 py-1 rounded-md"
+            >
+              Add User
+            </button>
+          )}
         </div>
       )}
       <ToastContainer position="bottom-left" />
