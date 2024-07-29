@@ -14,6 +14,8 @@ import UserAvatar from "/avatar.png";
 import { DB } from "../../../../lib/firebase";
 import { useState } from "react";
 import { useUserStore } from "../../../../lib/userStore";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function AddUser() {
   const [user, setUser] = useState(null);
@@ -26,12 +28,13 @@ export default function AddUser() {
 
     try {
       const userRef = collection(DB, "users");
-
       const q = query(userRef, where("Username", "==", Username));
       const querySnapShot = await getDocs(q);
 
       if (!querySnapShot.empty) {
         setUser(querySnapShot.docs[0].data());
+      } else {
+        toast.error("User not found");
       }
     } catch (err) {
       console.log(err);
@@ -39,10 +42,27 @@ export default function AddUser() {
   };
 
   const handleAdd = async () => {
-    const chatRef = collection(DB, "chats");
+    if (!user) return;
+
     const userChatsRef = collection(DB, "userchats");
+    const currentUserChatDoc = doc(userChatsRef, currentUser.id);
+    const currentUserChatDocSnap = await getDoc(currentUserChatDoc);
+
+    if (currentUserChatDocSnap.exists()) {
+      const currentUserChats = currentUserChatDocSnap.data().chats || [];
+
+      const alreadyInFriends = currentUserChats.some(
+        (chat) => chat.receiverId === user.id
+      );
+
+      if (alreadyInFriends) {
+        toast.info("This user is already in your friends list");
+        return;
+      }
+    }
 
     try {
+      const chatRef = collection(DB, "chats");
       const newChatRef = doc(chatRef);
 
       await setDoc(newChatRef, {
@@ -51,10 +71,7 @@ export default function AddUser() {
       });
 
       const userChatDoc = doc(userChatsRef, user.id);
-      const currentUserChatDoc = doc(userChatsRef, currentUser.id);
-
       const userChatDocSnap = await getDoc(userChatDoc);
-      const currentUserChatDocSnap = await getDoc(currentUserChatDoc);
 
       if (!userChatDocSnap.exists()) {
         await setDoc(userChatDoc, {
@@ -85,6 +102,8 @@ export default function AddUser() {
           updatedAt: Date.now(),
         }),
       });
+
+      toast.success("User added successfully");
     } catch (err) {
       console.log(err);
     }
@@ -121,6 +140,7 @@ export default function AddUser() {
           </button>
         </div>
       )}
+      <ToastContainer position="bottom-left" />
     </div>
   );
 }

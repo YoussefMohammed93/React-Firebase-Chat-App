@@ -18,7 +18,6 @@ export default function Details() {
           className="w-[100px] h-[100px] rounded-full object-cover"
         />
         <h2 className="text-xl text-white font-semibold">Youssef Mohamed</h2>
-        <p className="text-[#d2d2d2]">Lorem ipsum dolor, sit amit.</p>
       </div>
       <div className="info-details flex flex-col gap-6 p-3">
         <div className="option">

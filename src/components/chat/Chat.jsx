@@ -8,36 +8,83 @@ import EmojiIcon from "/emoji.png";
 import ImgIcon from "/img.png";
 import CamIcon from "/camera.png";
 import MicIcon from "/mic.png";
-import PatternImg from "/pattern.svg";
 import { DB } from "../../lib/firebase";
-import { doc, onSnapshot } from "firebase/firestore";
+import {
+  arrayUnion,
+  doc,
+  getDoc,
+  onSnapshot,
+  updateDoc,
+} from "firebase/firestore";
+import { useChatStore } from "../../lib/chatStore";
+import { useUserStore } from "../../lib/userStore";
+import { formatDistanceToNow } from "date-fns";
 
 export default function Chat() {
   const [open, setOpen] = useState(false);
   const [chat, setChat] = useState();
   const [text, setText] = useState("");
+  const { currentUser } = useUserStore();
+  const { chatId, user } = useChatStore();
+
   const handleEmoji = (e) => {
     setText((prev) => prev + e.emoji);
     setOpen(false);
   };
+
+  const handleSend = async () => {
+    if (text === "") return;
+
+    try {
+      await updateDoc(doc(DB, "chats", chatId), {
+        messages: arrayUnion({
+          senderId: currentUser.id,
+          text,
+          createdAt: new Date(),
+        }),
+      });
+
+      const userIDs = [currentUser.id, user.id];
+      userIDs.forEach(async (id) => {
+        const userChatsRef = doc(DB, "userchats", id);
+        const userChatsSnapshot = await getDoc(userChatsRef);
+
+        if (userChatsSnapshot.exists()) {
+          const userChatsData = userChatsSnapshot.data();
+          const chatIndex = userChatsData.chats.findIndex(
+            (c) => c.chatId === chatId
+          );
+
+          userChatsData.chats[chatIndex].lastMessage = text;
+          userChatsData.chats[chatIndex].isSeen =
+            id === currentUser.id ? true : false;
+          userChatsData.chats[chatIndex].updatedAt = Date.now();
+
+          await updateDoc(userChatsRef, {
+            chats: userChatsData.chats,
+          });
+        }
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const endRef = useRef(null);
 
   useEffect(() => {
     endRef.current.scrollIntoView({ behavior: "smooth" });
-  }, []);
+  }, [chat]);
 
   useEffect(() => {
-    const unSub = onSnapshot(
-      doc(DB, "chats", "u3AenQTR6xT1ZrGb2YoH"),
-      (res) => {
-        setChat(res.data());
-      }
-    );
+    const unSub = onSnapshot(doc(DB, "chats", chatId), (res) => {
+      setChat(res.data());
+    });
 
     return () => {
       unSub();
     };
-  }, []);
+  }, [chatId]);
 
   return (
     <div
@@ -53,17 +100,14 @@ export default function Chat() {
       >
         <div className="chat-user flex items-center">
           <img
-            src={UserAvatar}
+            src={user?.avatar || UserAvatar}
             alt="user-icon"
             className="w-[50px] h-[50px] rounded-full"
           />
           <div className="chat-texts ml-3">
             <span className="text-white text-lg font-semibold">
-              Youssef Mohammed
+              {user?.Username || "Unknown User"}
             </span>
-            <p className="text-[#d2d2d2] text-sm">
-              Lorem ipsum dolor, sit amit.
-            </p>
           </div>
         </div>
         <div className="chat-icons flex gap-1">
@@ -79,89 +123,46 @@ export default function Chat() {
         </div>
       </div>
       <div className="chat-center p-3 overflow-auto flex flex-col gap-4">
-        <div className="message flex max-w-[75%] gap-5">
-          <img
-            src={UserAvatar}
-            alt="user-icon"
-            className="w-8 h-8 rounded-full"
-          />
-          <div className="texts flex flex-col gap-2">
-            <span className="triangle"></span>
-            <p className="text-white p-3 rounded-md rounded-tl-none mt-3">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Aspernatur possimus animi sit fuga neque explicabo nisi ea, nemo
-              adipisci officiis impedit, non quasi ut consequatur?
-            </p>
-            <span className="text-[#b4b4b4] text-sm">1 min ago</span>
+        {chat?.messages?.map((message) => (
+          <div
+            className={`message flex max-w-[75%] gap-4 ${
+              message.senderId === currentUser.id ? "own" : ""
+            }`}
+            key={message?.createdAt}
+          >
+            {message.senderId !== currentUser.id && (
+              <img
+                src={user?.avatar || UserAvatar}
+                alt="user-icon"
+                className="w-8 h-8 rounded-full"
+              />
+            )}
+            <div className="texts flex flex-col gap-1">
+              {message.img && (
+                <img
+                  src={message.img}
+                  alt="message-image"
+                  className="w-full h-[300px] object-cover rounded-md"
+                />
+              )}
+              <p
+                className={`text-white px-3 py-[10px] rounded-md ${
+                  message.senderId === currentUser.id
+                    ? " rounded-tr-none"
+                    : "rounded-tl-none mt-3"
+                }`}
+              >
+                {message.text}
+              </p>
+              <span className="text-[#d2d2d2] text-sm">
+                {formatDistanceToNow(
+                  new Date(message.createdAt.seconds * 1000)
+                )}{" "}
+                ago
+              </span>
+            </div>
           </div>
-        </div>
-        <div className="message own flex max-w-[75%] gap-5">
-          <div className="texts flex flex-col gap-1">
-            <p className="text-white p-3 rounded-md">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Aspernatur possimus animi sit fuga neque explicabo nisi ea, nemo
-              adipisci officiis impedit, non quasi ut consequatur?
-            </p>
-            <span className="text-[#d2d2d2] text-sm">1 min ago</span>
-          </div>
-        </div>
-        <div className="message flex max-w-[75%] gap-5">
-          <img
-            src={UserAvatar}
-            alt="user-icon"
-            className="w-8 h-8 rounded-full"
-          />
-          <div className="texts flex flex-col gap-1">
-            <span className="triangle"></span>
-            <p className="text-white p-3 rounded-md rounded-tl-none mt-3">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Aspernatur possimus animi sit fuga neque explicabo nisi ea, nemo
-              adipisci officiis impedit, non quasi ut consequatur?
-            </p>
-            <span className="text-[#d2d2d2] text-sm">1 min ago</span>
-          </div>
-        </div>
-        <div className="message own flex max-w-[75%] gap-5">
-          <div className="texts flex flex-col gap-1">
-            <p className="text-white p-3 rounded-md">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Aspernatur possimus animi sit fuga neque explicabo nisi ea, nemo
-              adipisci officiis impedit, non quasi ut consequatur?
-            </p>
-            <span className="text-[#d2d2d2] text-sm">1 min ago</span>
-          </div>
-        </div>
-        <div className="message flex max-w-[75%] gap-5">
-          <img
-            src={UserAvatar}
-            alt="user-icon"
-            className="w-8 h-8 rounded-full"
-          />
-          <div className="texts flex flex-col gap-1">
-            <span className="triangle"></span>
-            <p className="text-white p-3 rounded-md rounded-tl-none mt-3">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Aspernatur possimus animi sit fuga neque explicabo nisi ea, nemo
-              adipisci officiis impedit, non quasi ut consequatur?
-            </p>
-            <span className="text-[#d2d2d2] text-sm">1 min ago</span>
-          </div>
-        </div>
-        <div className="message own flex max-w-[75%] gap-4">
-          <div className="texts flex flex-col gap-1">
-            <img
-              src={PatternImg}
-              alt="message-image"
-              className="w-full h-[300px] object-cover rounded-md"
-            />
-            <p className="text-white p-3 rounded-md">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Aspernatur possimus animi sit fuga neque explicabo nisi ea, nemo
-              adipisci officiis impedit, non quasi ut consequatur?
-            </p>
-            <span className="text-[#d2d2d2] text-sm">1 min ago</span>
-          </div>
-        </div>
+        ))}
         <div ref={endRef}></div>
       </div>
       <div
@@ -195,7 +196,10 @@ export default function Chat() {
             <EmojiPicker open={open} onEmojiClick={handleEmoji} />
           </div>
         </div>
-        <button className="send-btn bg-blue-500 px-3 py-1 text-white rounded-md hover:bg-blue-600 transition-all duration-200">
+        <button
+          onClick={handleSend}
+          className="send-btn bg-blue-500 px-3 py-1 text-white rounded-md hover:bg-blue-600 transition-all duration-200"
+        >
           Send
         </button>
       </div>

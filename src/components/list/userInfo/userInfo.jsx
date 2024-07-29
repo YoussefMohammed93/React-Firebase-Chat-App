@@ -1,14 +1,38 @@
+import { useState, useEffect, useRef } from "react";
 import MoreIcon from "/more.png";
-import VideoIcon from "/video.png";
-import EditIcon from "/edit.png";
 import UserAvatar from "/avatar.png";
 import { useUserStore } from "../../../lib/userStore";
+import { auth } from "../../../lib/firebase";
 
 export default function UserInfo() {
   const { currentUser } = useUserStore();
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
 
   return (
-    <div className="user-info flex items-center justify-between p-3">
+    <div className="user-info flex items-center justify-between p-3 relative">
       <div className="user flex items-center">
         <img
           src={currentUser.avatar || UserAvatar}
@@ -20,15 +44,25 @@ export default function UserInfo() {
         </h2>
       </div>
       <div className="icons flex items-center">
-        <button className="hover:bg-[#1119284e] transition-all duration-200 p-[6px] rounded-full">
+        <button
+          onClick={toggleMenu}
+          className="hover:bg-[#1119284e] transition-all duration-200 p-[9px] rounded-full"
+        >
           <img src={MoreIcon} alt="more-icon" className="w-5 h-5" />
         </button>
-        <button className="hover:bg-[#1119284e] transition-all duration-200 p-2 rounded-full">
-          <img src={VideoIcon} alt="video-icon" className="w-5 h-5" />
-        </button>
-        <button className="hover:bg-[#1119284e] transition-all duration-200 p-2 rounded-full">
-          <img src={EditIcon} alt="edit-icon" className="w-5 h-5" />
-        </button>
+        {isOpen && (
+          <div
+            ref={dropdownRef}
+            className="dropdown-menu absolute right-[18px] top-[56px] w-48 bg-[#2c61dc] rounded shadow-lg z-20"
+          >
+            <button
+              onClick={() => auth.signOut()}
+              className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#355db9] rounded duration-200 transition-all"
+            >
+              Log Out
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

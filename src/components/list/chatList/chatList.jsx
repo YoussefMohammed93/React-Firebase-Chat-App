@@ -5,13 +5,15 @@ import MinusIcon from "/minus.png";
 import UserAvatar from "/avatar.png";
 import AddUser from "./addUser/AddUser";
 import { useUserStore } from "../../../lib/userStore";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { useChatStore } from "../../../lib/chatStore";
+import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { DB } from "../../../lib/firebase";
 
 const ChatList = () => {
   const [chats, setChats] = useState([]);
   const [addMode, setAddMode] = useState(false);
   const { currentUser } = useUserStore();
+  const { changeChat, chatId } = useChatStore();
 
   useEffect(() => {
     const unSub = onSnapshot(
@@ -33,7 +35,6 @@ const ChatList = () => {
         });
 
         const chatData = await Promise.all(promises);
-
         setChats(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
       }
     );
@@ -42,6 +43,29 @@ const ChatList = () => {
       unSub();
     };
   }, [currentUser.id]);
+
+  const handleSelect = async (chat) => {
+    const userChats = chats.map((item) => {
+      const { user, ...rest } = item;
+      return rest;
+    });
+
+    const chatIndex = userChats.findIndex(
+      (item) => item.chatId === chat.chatId
+    );
+
+    userChats[chatIndex].isSeen = true;
+    const userChatsRef = doc(DB, "userchats", currentUser.id);
+
+    try {
+      await updateDoc(userChatsRef, {
+        chats: userChats,
+      });
+      changeChat(chat.chatId, chat.user);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <div className="chat-list overflow-y-auto">
@@ -65,14 +89,24 @@ const ChatList = () => {
           <img
             src={addMode ? MinusIcon : PlusIcon}
             alt="plus-icon"
-            className="w-[17.px] h-[17.5px]"
+            className="w-[17.5px] h-[17.5px]"
           />
         </button>
       </div>
       <ul className="mt-[6px]">
         {chats.map((chat) => (
-          <li className="chat-list-li" key={chat.chatId}>
-            <button className="item w-full p-3 flex items-center gap-3 text-start hover:bg-[#1119284e] transition-all duration-200">
+          <li
+            className="chat-list-li"
+            key={chat.chatId}
+            onClick={() => handleSelect(chat)}
+            style={{
+              background: chat?.isSeen ? "transparent" : "#5185fe52",
+            }}
+          >
+            <button
+              className="item w-full p-3 flex items-center gap-3 text-start hover:bg-[#1119284e] transition-all duration-200"
+              onClick={() => changeChat(chat.chatId, chat.user)}
+            >
               <img
                 src={chat.user.avatar || UserAvatar}
                 alt="user-icon"

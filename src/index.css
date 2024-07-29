@@ -75,7 +75,7 @@ body {
 }
 
 .message.own .texts p {
-  background: #5185fe52;
+  background: #2c61dc;
 }
 
 .message.own .texts p::before {
