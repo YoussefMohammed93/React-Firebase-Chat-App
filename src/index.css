@@ -156,7 +156,7 @@ body {
 
 .send-btn:disabled {
   cursor: not-allowed;
-  background: #5182feb4;
+  background: #5182feb3;
 }
 .chat-input input:disabled,
 .emoji-btn:disabled,
