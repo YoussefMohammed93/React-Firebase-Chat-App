@@ -29,8 +29,6 @@ export default function UserInfo() {
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
     }
-
-    // Cleanup on component unmount
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };

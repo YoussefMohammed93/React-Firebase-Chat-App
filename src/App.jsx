@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import List from "./components/list/List";
-import Chat from "./components/chat/Chat";
-import Login from "./components/login/Login";
-import Notifications from "./components/notifications/Notifications";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./lib/firebase";
 import { useUserStore } from "./lib/userStore";
 import { useChatStore } from "./lib/chatStore";
+import List from "./components/list/List";
+import Chat from "./components/chat/Chat";
+import Login from "./components/login/Login";
+import Notifications from "./components/notifications/Notifications";
 
 export default function App() {
   const { currentUser, isLoading, fetchUserInfo } = useUserStore();

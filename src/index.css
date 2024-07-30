@@ -100,23 +100,17 @@ body {
   background: #1f8ff154;
 }
 
-/* styles.css or Spinner.module.css */
 .spinner-overlay {
-  position: fixed; /* Fixed positioning ensures it stays in place when scrolling */
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100vw; /* Full viewport width */
-  height: 100vh; /* Full viewport height */
+  width: 100vw;
+  height: 100vh;
   display: flex;
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  background-color: rgba(
-    0,
-    0,
-    0,
-    0.5
-  ); /* Optional: Adds a semi-transparent background */
-  z-index: 9999; /* Ensure it appears above other content */
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
 }
 
 .lds-ring {
@@ -158,4 +152,14 @@ body {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.send-btn:disabled {
+  cursor: not-allowed;
+  background: #5182feb4;
+}
+.chat-input input:disabled,
+.emoji-btn:disabled,
+.img-btn:disabled {
+  cursor: not-allowed;
 }

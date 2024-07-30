@@ -1,9 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import EmojiPicker from "emoji-picker-react";
 import UserAvatar from "/avatar.png";
-import PhoneIcon from "/phone.png";
-import VideoIcon from "/video.png";
-import InfoIcon from "/info.png";
 import EmojiIcon from "/emoji.png";
 import ImgIcon from "/img.png";
 import BackIcon from "/back.png";
@@ -27,9 +24,6 @@ export default function Chat({ setShowChatList }) {
   const [text, setText] = useState("");
   const { currentUser } = useUserStore();
   const { chatId, user } = useChatStore();
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  const [messageToDelete, setMessageToDelete] = useState(null);
-
   const fileInputRef = useRef(null);
   const endRef = useRef(null);
 
@@ -50,10 +44,10 @@ export default function Chat({ setShowChatList }) {
     if (messageText.trim() === "" && !imgUrl) return;
 
     try {
-      const messageId = uuidv4(); // Generate a unique ID for the message
+      const messageId = uuidv4();
       await updateDoc(doc(DB, "chats", chatId), {
         messages: arrayUnion({
-          id: messageId, // Add unique ID to each message
+          id: messageId,
           senderId: currentUser.id,
           text: messageText,
           createdAt: new Date(),
@@ -95,53 +89,6 @@ export default function Chat({ setShowChatList }) {
 
   const handleSend = async () => {
     await sendMessage(text);
-  };
-
-  const deleteMessage = async () => {
-    if (!messageToDelete) return;
-
-    try {
-      // Update chat document
-      const chatRef = doc(DB, "chats", chatId);
-      const chatSnapshot = await getDoc(chatRef);
-      const chatData = chatSnapshot.data();
-
-      const updatedMessages = chatData.messages.filter(
-        (msg) => msg.id !== messageToDelete.id
-      );
-
-      await updateDoc(chatRef, { messages: updatedMessages });
-
-      // Update userchats
-      const userIDs = [currentUser.id, user.id];
-      await Promise.all(
-        userIDs.map(async (id) => {
-          const userChatsRef = doc(DB, "userchats", id);
-          const userChatsSnapshot = await getDoc(userChatsRef);
-
-          if (userChatsSnapshot.exists()) {
-            const userChatsData = userChatsSnapshot.data();
-            const chatIndex = userChatsData.chats.findIndex(
-              (c) => c.chatId === chatId
-            );
-
-            if (chatIndex > -1) {
-              const lastMessage = updatedMessages.slice(-1)[0] || {};
-              userChatsData.chats[chatIndex].lastMessage =
-                lastMessage.text || "";
-              userChatsData.chats[chatIndex].updatedAt = Date.now();
-
-              await updateDoc(userChatsRef, { chats: userChatsData.chats });
-            }
-          }
-        })
-      );
-
-      setMessageToDelete(null);
-      setConfirmDelete(false);
-    } catch (err) {
-      console.error("Error deleting message:", err);
-    }
   };
 
   useEffect(() => {
@@ -195,11 +142,6 @@ export default function Chat({ setShowChatList }) {
             </span>
           </div>
         </div>
-        <div className="chat-actions flex items-center gap-4">
-          <img src={PhoneIcon} alt="phone" className="w-6 h-6 cursor-pointer" />
-          <img src={VideoIcon} alt="video" className="w-6 h-6 cursor-pointer" />
-          <img src={InfoIcon} alt="info" className="w-6 h-6 cursor-pointer" />
-        </div>
       </div>
       <div className="chat-messages flex-1 overflow-y-auto p-4">
         {chat?.messages?.map((message) => (
@@ -249,7 +191,7 @@ export default function Chat({ setShowChatList }) {
       <div className="chat-input flex items-center p-4 border-t border-gray-500">
         <input
           type="text"
-          className="flex-1 p-2 rounded-md bg-[#1119284e] text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 p-2 rounded-md bg-[#1119284e] text-white border-none outline-none focus:ring-2 focus:ring-blue-500 duration-300 transition-all"
           placeholder="Type a message ..."
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -265,7 +207,7 @@ export default function Chat({ setShowChatList }) {
           className="ml-2 p-2 rounded-md text-white bg-[#11192880] hover:bg-[#0c0f15be] transition-all duration-200"
           onClick={() => setOpen(!open)}
         >
-          <img src={EmojiIcon} alt="emoji" className="w-6 h-6" />
+          <img src={EmojiIcon} alt="emoji" className="w-6 h-6 object-cover" />
         </button>
         <button
           className="ml-2 p-2 rounded-md text-white bg-[#11192880] hover:bg-[#0c0f15be] transition-all duration-200"
@@ -283,29 +225,6 @@ export default function Chat({ setShowChatList }) {
       {open && (
         <div className="emoji-picker fixed bottom-20 right-10">
           <EmojiPicker onEmojiClick={handleEmoji} />
-        </div>
-      )}
-      {confirmDelete && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-4 rounded-md">
-            <p className="text-gray-700">
-              Are you sure you want to delete this message?
-            </p>
-            <div className="mt-2 flex justify-end gap-2">
-              <button
-                onClick={deleteMessage}
-                className="bg-red-500 text-white px-4 py-2 rounded-md"
-              >
-                Yes
-              </button>
-              <button
-                onClick={() => setConfirmDelete(false)}
-                className="bg-gray-300 px-4 py-2 rounded-md"
-              >
-                No
-              </button>
-            </div>
-          </div>
         </div>
       )}
     </div>

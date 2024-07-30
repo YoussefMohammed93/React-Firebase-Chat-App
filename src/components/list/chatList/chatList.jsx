@@ -13,9 +13,10 @@ import Spinner from "../../Load/Spinner";
 const ChatList = ({ setShowChatList }) => {
   const [chats, setChats] = useState([]);
   const [addMode, setAddMode] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // State for loading
+  const [isLoading, setIsLoading] = useState(true);
   const { currentUser } = useUserStore();
   const { changeChat, chatId } = useChatStore();
+  const [input, setInput] = useState("");
 
   useEffect(() => {
     const unSub = onSnapshot(
@@ -24,7 +25,7 @@ const ChatList = ({ setShowChatList }) => {
         const data = res.data();
         if (!data) {
           setChats([]);
-          setIsLoading(false); // Set loading to false when data is fetched
+          setIsLoading(false);
           return;
         }
 
@@ -39,7 +40,7 @@ const ChatList = ({ setShowChatList }) => {
 
         const chatData = await Promise.all(promises);
         setChats(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
-        setIsLoading(false); // Set loading to false when data is fetched
+        setIsLoading(false);
       }
     );
 
@@ -80,6 +81,10 @@ const ChatList = ({ setShowChatList }) => {
     );
   }
 
+  const filterdChats = chats.filter((c) =>
+    c.user.Username.toLowerCase().includes(input.toLowerCase())
+  );
+
   return (
     <div className="chat-list overflow-y-auto">
       <div className="search flex items-center justify-between gap-4 px-3">
@@ -93,6 +98,7 @@ const ChatList = ({ setShowChatList }) => {
             type="text"
             placeholder="Search"
             className="search-input w-full bg-[#11192880] rounded-md pl-[55px] pr-1 py-[6px] focus:outline-none text-white"
+            onChange={(e) => setInput(e.target.value)}
           />
         </div>
         <button
@@ -112,7 +118,7 @@ const ChatList = ({ setShowChatList }) => {
         </p>
       )}
       <ul className="mt-[6px]">
-        {chats.map((chat) => (
+        {filterdChats.map((chat) => (
           <li
             className="chat-list-li"
             key={chat.chatId}
