@@ -132,13 +132,13 @@ const ChatList = ({ setShowChatList }) => {
               onClick={() => handleSelect(chat)}
             >
               <img
-                src={chat.user.avatar || UserAvatar}
+                src={chat.user?.avatar || UserAvatar}
                 alt="user-icon"
                 className="w-11 h-11 rounded-full"
               />
               <div className="texts">
                 <span className="font-semibold text-white">
-                  {chat.user.Username || "Unknown User"}
+                  {chat.user?.Username || "Unknown User"}
                 </span>
                 <p className="text-sm text-[#d2d2d2]">{chat.lastMessage}</p>
               </div>

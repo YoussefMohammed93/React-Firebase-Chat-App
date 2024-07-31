@@ -40,7 +40,7 @@ export default function UserInfo() {
         <img
           src={currentUser.avatar || UserAvatar}
           alt="user-icon"
-          className="w-11 h-11 rounded-full"
+          className="w-11 h-11 rounded-full object-contain"
         />
         <h2 className="text-lg font-semibold text-white ml-3">
           {currentUser.Username} ( You )

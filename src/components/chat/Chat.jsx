@@ -131,7 +131,7 @@ export default function Chat({ setShowChatList }) {
           <img
             src={user?.avatar || UserAvatar}
             alt="user-icon"
-            className="w-12 h-12 rounded-full"
+            className="w-12 h-12 rounded-full object-contain"
           />
           <div className="chat-texts ml-3 text-sm">
             <p className="chat-name text-gray-200 font-medium">
