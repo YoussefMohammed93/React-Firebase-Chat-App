@@ -79,7 +79,7 @@ export default function Login() {
             {loading ? "Loading" : "Log In"}
           </button>
           <Link to="/signup" className="text-white underline text-lg">
-            Not have an account , sign up now!
+            Don't have an account , sign up now!
           </Link>
         </form>
       </div>
